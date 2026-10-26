@@ -1,4 +1,5 @@
-"""3~7장: 이해하기 쉬운 기본 GPT. (학습에는 8장의 빠른 GPT를 씁니다.)"""
+"""3~7장: 이해하기 쉬운 기본 GPT. (학습에는 8장의 빠른 GPT를 씁니다.)
+부품은 문장 하나(글자, 숫자)와 배치(문장, 글자, 숫자)를 모두 받습니다."""
 from dataclasses import dataclass
 
 import torch
@@ -24,7 +25,7 @@ class Embeddings(nn.Module):
         self.pos_emb = nn.Embedding(cfg.block_size, cfg.n_embd)
 
     def forward(self, idx):
-        T = idx.shape[1]
+        T = idx.shape[-1]
         pos = torch.arange(T, device=idx.device)
         tok = self.token_emb(idx)
         p = self.pos_emb(pos)
@@ -39,20 +40,19 @@ class Head(nn.Module):
         self.query = nn.Linear(cfg.n_embd, head_size, bias=False)
         self.key = nn.Linear(cfg.n_embd, head_size, bias=False)
         self.value = nn.Linear(cfg.n_embd, head_size, bias=False)
-        mask = torch.tril(torch.ones(cfg.block_size, cfg.block_size))
-        self.register_buffer("mask", mask)
 
     def forward(self, x):
-        T = x.shape[1]
+        T = x.shape[-2]
         q = self.query(x)
         k = self.key(x)
         v = self.value(x)
 
         scores = q @ k.transpose(-2, -1)                  # ① 관련도
         scores = scores / k.shape[-1] ** 0.5
-        mask = self.mask[:T, :T]
+        mask = torch.tril(torch.ones(T, T, device=x.device))
         scores = scores.masked_fill(mask == 0, float("-inf"))  # ② 미래 가리기
         weights = F.softmax(scores, dim=-1)               # ③ 비율로 바꾸기
+        self.weights = weights                            # 비율 표를 남겨 두기
         out = weights @ v                                 # ④ 가중합
         return out
 

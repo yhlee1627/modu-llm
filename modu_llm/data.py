@@ -1,4 +1,7 @@
 """2·3·9장: 이야기 불러오기, 인코딩, 배치."""
+import os
+import time
+
 import numpy as np
 import torch
 
@@ -33,3 +36,22 @@ def get_batch(data, block_size, batch_size, device="cpu"):
     x = torch.stack([torch.from_numpy(data[i:i + block_size].astype(np.int64)) for i in ix])
     y = torch.stack([torch.from_numpy(data[i + 1:i + block_size + 1].astype(np.int64)) for i in ix])
     return x.to(device), y.to(device)
+
+
+def prepare_stories(n, vocab, folder, ratio=0.9):
+    """9장: 이야기 n편을 번호 배열로 준비하고 (학습용, 검증용)을 돌려줍니다.
+    folder에 tokens_n.npy가 있으면 불러오고, 없으면 내려받아 인코딩한 뒤 저장합니다."""
+    path = os.path.join(folder, f"tokens_{n}.npy")
+    if os.path.exists(path):
+        data = np.load(path)
+        print("저장된 데이터를 불러왔습니다.")
+    else:
+        t0 = time.time()
+        stories = load_stories(n)
+        data = encode_texts(stories, vocab)
+        np.save(path, data)
+        print(f"이야기 {len(stories):,}편 인코딩 완료 ({time.time() - t0:.0f}초)")
+    print(f"글자 수: {len(data):,}")
+    print(f"uint16 배열: {round(data.nbytes / 1e6):,}MB")
+    print(f"파이썬 정수 리스트였다면 약 {round(len(data) * 36 / 1e6):,}MB")
+    return split_data(data, ratio)
