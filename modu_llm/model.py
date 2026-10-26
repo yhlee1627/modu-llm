@@ -28,7 +28,7 @@ class CausalSelfAttention(nn.Module):
         # 점수 → 미래 가리기 → softmax → 가중합을 한 번에
         y = F.scaled_dot_product_attention(q, k, v, is_causal=True)
         # (B, 헤드 수, T, 헤드 크기) → (B, T, C): 헤드 결과 이어 붙이기
-        y = y.transpose(1, 2).contiguous().view(B, T, C)
+        y = y.transpose(1, 2).reshape(B, T, C)
         return self.proj(y)
 
 
