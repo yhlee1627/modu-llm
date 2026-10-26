@@ -93,7 +93,11 @@ class Block(nn.Module):
         self.ln1 = nn.LayerNorm(cfg.n_embd)
         self.attn = MultiHead(cfg)
         self.ln2 = nn.LayerNorm(cfg.n_embd)
-        self.mlp = make_mlp(cfg)
+        self.mlp = nn.Sequential(
+            nn.Linear(cfg.n_embd, 4 * cfg.n_embd),
+            nn.GELU(),
+            nn.Linear(4 * cfg.n_embd, cfg.n_embd),
+        )
 
     def forward(self, x):
         x = x + self.attn(self.ln1(x))
