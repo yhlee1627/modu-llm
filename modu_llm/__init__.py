@@ -13,7 +13,7 @@ from .viz import show_weights
 from .bench import time_steps
 from .helpers import get_device, plot_history
 
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 
 __all__ = [
     "ASSET_REPO", "DRIVE_DIR", "END", "SFT_REPO", "STORY_REPO",

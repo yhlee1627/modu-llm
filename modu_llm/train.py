@@ -1,7 +1,6 @@
 """9장: 학습 루프와 체크포인트. 11장에서 그대로 다시 씁니다."""
 import os
 import time
-from dataclasses import asdict
 
 import torch
 
@@ -31,7 +30,7 @@ def estimate_loss(model, train_data, val_data, batch_size=32, iters=20):
 def save_checkpoint(path, model, optimizer=None, step=0, history=None):
     os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
     torch.save({
-        "cfg": asdict(model.cfg),
+        "cfg": dict(vars(model.cfg)),   # 설정 다섯 개를 딕셔너리로
         "model": model.state_dict(),
         "optimizer": optimizer.state_dict() if optimizer is not None else None,
         "step": step,

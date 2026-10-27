@@ -1,19 +1,20 @@
 """3~7장: 이해하기 쉬운 기본 GPT. (학습에는 8장의 빠른 GPT를 씁니다.)
 부품은 문장 하나(글자, 숫자)와 배치(문장, 글자, 숫자)를 모두 받습니다."""
-from dataclasses import dataclass
-
 import torch
 from torch import nn
 from torch.nn import functional as F
 
 
-@dataclass
 class GPTConfig:
-    vocab_size: int = 2453   # Vocab.build()의 글자 수
-    block_size: int = 384    # 한 번에 보는 글자 수 (문맥 길이)
-    n_embd: int = 256        # 글자 하나를 나타내는 벡터의 길이
-    n_head: int = 4          # 어텐션 헤드 수
-    n_layer: int = 6         # Transformer 블록 수
+    """3장: 모델의 크기를 정하는 설정 다섯 개를 담는 상자."""
+
+    def __init__(self, vocab_size=2453, block_size=384, n_embd=256,
+                 n_head=4, n_layer=6):
+        self.vocab_size = vocab_size    # 사전의 글자 수 (2장)
+        self.block_size = block_size    # 한 번에 보는 글자 수 (3.1)
+        self.n_embd = n_embd            # 글자 벡터의 길이 (3.5)
+        self.n_head = n_head            # 어텐션 헤드 수 (5장에서 씀)
+        self.n_layer = n_layer          # 블록 층 수 (6장에서 씀)
 
 
 class Embeddings(nn.Module):
