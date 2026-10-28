@@ -25,7 +25,7 @@ class CausalSelfAttention(nn.Module):
         q = q.view(B, T, self.n_head, hs).transpose(1, 2)
         k = k.view(B, T, self.n_head, hs).transpose(1, 2)
         v = v.view(B, T, self.n_head, hs).transpose(1, 2)
-        # 점수 → 미래 가리기 → softmax → 가중합을 한 번에
+        # 점수 → 나누기 → 가리기 → 비율 → 섞기를 한 번에
         y = F.scaled_dot_product_attention(q, k, v, is_causal=True)
         # (B, 헤드 수, T, 헤드 크기) → (B, T, C): 헤드 결과 이어 붙이기
         y = y.transpose(1, 2).reshape(B, T, C)

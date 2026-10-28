@@ -48,13 +48,13 @@ class Head(nn.Module):
         k = self.key(x)
         v = self.value(x)
 
-        scores = q @ k.transpose(-2, -1)                  # ① 관련도
-        scores = scores / k.shape[-1] ** 0.5
+        scores = q @ k.transpose(-2, -1)                  # ① 점수
+        scores = scores / k.shape[-1] ** 0.5              # ② 나누기
         mask = torch.tril(torch.ones(T, T, device=x.device))
-        scores = scores.masked_fill(mask == 0, float("-inf"))  # ② 미래 가리기
-        weights = F.softmax(scores, dim=-1)               # ③ 비율로 바꾸기
+        scores = scores.masked_fill(mask == 0, float("-inf"))  # ③ 가리기
+        weights = F.softmax(scores, dim=-1)               # ④ 비율
         self.weights = weights                            # 비율 표를 남겨 두기
-        out = weights @ v                                 # ④ 가중합
+        out = weights @ v                                 # ⑤ 섞기
         return out
 
 
