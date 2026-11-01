@@ -54,7 +54,7 @@ class Head(nn.Module):
         scores = scores.masked_fill(mask == 0, float("-inf"))  # ③ 가리기
         weights = F.softmax(scores, dim=-1)               # ④ 비율
         self.weights = weights                            # 비율 표를 남겨 두기
-        out = weights @ v                                 # ⑤ 섞기
+        out = weights @ v                                 # ⑤ 모으기
         return out
 
 
